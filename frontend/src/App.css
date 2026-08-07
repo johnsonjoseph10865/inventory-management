@@ -1,0 +1,198 @@
+/* ===============================
+   Global
+================================= */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #edf2fb;
+}
+
+/* ===============================
+   Main Background
+================================= */
+
+.main-bg {
+  min-height: 100vh;
+  padding: 30px;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+}
+
+/* ===============================
+   Header
+================================= */
+
+.header {
+  background: white;
+  padding: 25px;
+  border-radius: 18px;
+  text-align: center;
+  margin-bottom: 25px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.header h1 {
+  color: #2563eb;
+  font-weight: bold;
+}
+
+.header p {
+  color: gray;
+  margin-bottom: 0;
+}
+
+/* ===============================
+   Cards
+================================= */
+
+.card {
+  border: none;
+  border-radius: 18px;
+  transition: 0.3s;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.shadow-card {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ===============================
+   Form
+================================= */
+
+.form-control {
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.35);
+  border-color: #2563eb;
+}
+
+/* ===============================
+   Buttons
+================================= */
+
+.btn {
+  border-radius: 10px;
+  transition: 0.3s;
+  font-weight: 600;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+.btn-primary {
+  background: #2563eb;
+  border: none;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.btn-warning {
+  color: white;
+}
+
+.btn-warning:hover {
+  background: #d97706;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
+/* ===============================
+   Search
+================================= */
+
+.search-box {
+  margin: 20px 0;
+}
+
+/* ===============================
+   Table
+================================= */
+
+.table {
+  border-radius: 15px;
+  overflow: hidden;
+  background: white;
+}
+
+.table th {
+  font-size: 15px;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.table-hover tbody tr {
+  transition: 0.3s;
+}
+
+.table-hover tbody tr:hover {
+  background: #eef6ff;
+  transform: scale(1.01);
+}
+
+/* ===============================
+   Badges
+================================= */
+
+.badge {
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+/* ===============================
+   Dashboard Cards
+================================= */
+
+.dashboard-card {
+  color: white;
+  border-radius: 18px;
+  text-align: center;
+  padding: 20px;
+}
+
+.dashboard-card svg {
+  margin-bottom: 10px;
+}
+
+.dashboard-card h2 {
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.dashboard-card h5 {
+  margin-top: 10px;
+}
+
+/* ===============================
+   Responsive
+================================= */
+
+@media (max-width: 768px) {
+  .header h1 {
+    font-size: 28px;
+  }
+
+  .table {
+    font-size: 14px;
+  }
+
+  .btn {
+    margin-bottom: 5px;
+  }
+}
