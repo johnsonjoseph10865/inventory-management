@@ -1,4 +1,5 @@
 const express = require("express");
+
 const router = express.Router();
 
 const {
@@ -8,16 +9,57 @@ const {
   deleteProduct,
 } = require("../controllers/productController");
 
-// Add Product
-router.post("/", addProduct);
+const {
+  protect,
+  authorize,
+} = require("../middleware/authMiddleware");
 
-// Get All Products
-router.get("/", getProducts);
+// =====================================
+// GET ALL PRODUCTS
+// Admin + Staff + Viewer
+// =====================================
 
-// Update Product
-router.put("/:id", updateProduct);
+router.get(
+  "/",
+  protect,
+  authorize("admin", "staff", "viewer"),
+  getProducts
+);
 
-// Delete Product
-router.delete("/:id", deleteProduct);
+// =====================================
+// ADD PRODUCT
+// Admin + Staff
+// =====================================
+
+router.post(
+  "/",
+  protect,
+  authorize("admin", "staff"),
+  addProduct
+);
+
+// =====================================
+// UPDATE PRODUCT
+// Admin + Staff
+// =====================================
+
+router.put(
+  "/:id",
+  protect,
+  authorize("admin", "staff"),
+  updateProduct
+);
+
+// =====================================
+// DELETE PRODUCT
+// Admin only
+// =====================================
+
+router.delete(
+  "/:id",
+  protect,
+  authorize("admin"),
+  deleteProduct
+);
 
 module.exports = router;

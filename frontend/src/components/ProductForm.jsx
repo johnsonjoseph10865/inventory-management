@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+
 import {
-  FaBoxOpen,
-  FaTag,
-  FaLayerGroup,
+  FaBox,
+  FaTags,
   FaRupeeSign,
-  FaWarehouse,
+  FaHashtag,
   FaTruck,
-  FaFileAlt,
-  FaPlusCircle,
-  FaSave,
+  FaAlignLeft,
+  FaPlus,
+  FaEdit,
   FaTimes,
 } from "react-icons/fa";
 
@@ -16,234 +16,342 @@ function ProductForm({
   addProduct,
   updateProduct,
   editingProduct,
+  onCancel,
 }) {
-  const initialState = {
+  const [formData, setFormData] = useState({
     productName: "",
-    sku: "",
     category: "",
     price: "",
     quantity: "",
     supplier: "",
     description: "",
-  };
+  });
 
-  const [formData, setFormData] = useState(initialState);
+  // =====================================
+  // LOAD EDITING PRODUCT
+  // =====================================
 
   useEffect(() => {
     if (editingProduct) {
-      setFormData(editingProduct);
+      setFormData({
+        productName: editingProduct.productName || "",
+        category: editingProduct.category || "",
+        price: editingProduct.price ?? "",
+        quantity: editingProduct.quantity ?? "",
+        supplier: editingProduct.supplier || "",
+        description: editingProduct.description || "",
+      });
     } else {
-      setFormData(initialState);
+      setFormData({
+        productName: "",
+        category: "",
+        price: "",
+        quantity: "",
+        supplier: "",
+        description: "",
+      });
     }
   }, [editingProduct]);
 
+  // =====================================
+  // HANDLE INPUT CHANGE
+  // =====================================
+
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
+
+  // =====================================
+  // CLEAR FORM
+  // =====================================
+
+  const clearForm = () => {
     setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
+      productName: "",
+      category: "",
+      price: "",
+      quantity: "",
+      supplier: "",
+      description: "",
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  // =====================================
+  // CANCEL EDITING
+  // =====================================
 
-    if (editingProduct) {
-      updateProduct(editingProduct._id, formData);
-    } else {
-      addProduct(formData);
+  const handleCancel = () => {
+    clearForm();
+
+    if (onCancel) {
+      onCancel();
     }
-
-    setFormData(initialState);
   };
 
-  const clearForm = () => {
-    setFormData(initialState);
-    window.location.reload();
+  // =====================================
+  // SUBMIT FORM
+  // =====================================
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Basic validation
+    if (
+      !formData.productName.trim() ||
+      !formData.category.trim() ||
+      !formData.supplier.trim()
+    ) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    if (Number(formData.price) < 0) {
+      alert("Price cannot be negative.");
+      return;
+    }
+
+    if (Number(formData.quantity) < 0) {
+      alert("Quantity cannot be negative.");
+      return;
+    }
+
+    try {
+      if (editingProduct) {
+        await updateProduct(
+          editingProduct._id,
+          {
+            ...formData,
+            price: Number(formData.price),
+            quantity: Number(formData.quantity),
+          }
+        );
+      } else {
+        await addProduct({
+          ...formData,
+          price: Number(formData.price),
+          quantity: Number(formData.quantity),
+        });
+      }
+
+      clearForm();
+    } catch (error) {
+      console.error(
+        "Form submission error:",
+        error
+      );
+    }
   };
 
   return (
-    <div className="card shadow-card p-4 mb-4">
+    <div className="product-form-card">
 
-      <h3 className="text-primary mb-4">
+      {/* =================================
+          FORM HEADER
+      ================================= */}
 
-        {editingProduct ? (
-          <>
-            <FaSave className="me-2" />
-            Update Product
-          </>
-        ) : (
-          <>
-            <FaPlusCircle className="me-2" />
-            Add Product
-          </>
-        )}
+      <div className="product-form-header">
 
-      </h3>
+        <div className="form-title-icon">
+          {editingProduct ? (
+            <FaEdit />
+          ) : (
+            <FaPlus />
+          )}
+        </div>
+
+        <div>
+          <h2>
+            {editingProduct
+              ? "Edit Product"
+              : "Add Product"}
+          </h2>
+
+          <p>
+            {editingProduct
+              ? "Update the product information"
+              : "Enter details to add a new product"}
+          </p>
+        </div>
+
+      </div>
+
+      {/* =================================
+          FORM
+      ================================= */}
 
       <form onSubmit={handleSubmit}>
 
-        <div className="row">
+        <div className="form-grid">
 
-          <div className="col-md-6 mb-3">
+          {/* PRODUCT NAME */}
 
-            <label className="form-label">
-              <FaBoxOpen className="me-2" />
+          <div className="form-group">
+
+            <label htmlFor="productName">
+              <FaBox />
               Product Name
             </label>
 
             <input
+              id="productName"
               type="text"
-              className="form-control"
               name="productName"
+              placeholder="Enter product name"
               value={formData.productName}
               onChange={handleChange}
-              placeholder="Enter Product Name"
               required
             />
 
           </div>
 
-          <div className="col-md-6 mb-3">
+          {/* CATEGORY */}
 
-            <label className="form-label">
-              <FaTag className="me-2" />
-              SKU
-            </label>
+          <div className="form-group">
 
-            <input
-              type="text"
-              className="form-control"
-              name="sku"
-              value={formData.sku}
-              onChange={handleChange}
-              placeholder="Enter SKU"
-              required
-            />
-
-          </div>
-
-          <div className="col-md-6 mb-3">
-
-            <label className="form-label">
-              <FaLayerGroup className="me-2" />
+            <label htmlFor="category">
+              <FaTags />
               Category
             </label>
 
             <input
+              id="category"
               type="text"
-              className="form-control"
               name="category"
+              placeholder="Enter category"
               value={formData.category}
               onChange={handleChange}
-              placeholder="Category"
               required
             />
 
           </div>
 
-          <div className="col-md-6 mb-3">
+          {/* PRICE */}
 
-            <label className="form-label">
-              <FaRupeeSign className="me-2" />
+          <div className="form-group">
+
+            <label htmlFor="price">
+              <FaRupeeSign />
               Price
             </label>
 
             <input
+              id="price"
               type="number"
-              className="form-control"
               name="price"
+              placeholder="Enter price"
+              min="0"
+              step="0.01"
               value={formData.price}
               onChange={handleChange}
-              placeholder="Price"
               required
             />
 
           </div>
 
-          <div className="col-md-6 mb-3">
+          {/* QUANTITY */}
 
-            <label className="form-label">
-              <FaWarehouse className="me-2" />
+          <div className="form-group">
+
+            <label htmlFor="quantity">
+              <FaHashtag />
               Quantity
             </label>
 
             <input
+              id="quantity"
               type="number"
-              className="form-control"
               name="quantity"
+              placeholder="Enter quantity"
+              min="0"
+              step="1"
               value={formData.quantity}
               onChange={handleChange}
-              placeholder="Quantity"
               required
             />
 
           </div>
 
-          <div className="col-md-6 mb-3">
+          {/* SUPPLIER */}
 
-            <label className="form-label">
-              <FaTruck className="me-2" />
+          <div className="form-group">
+
+            <label htmlFor="supplier">
+              <FaTruck />
               Supplier
             </label>
 
             <input
+              id="supplier"
               type="text"
-              className="form-control"
               name="supplier"
+              placeholder="Enter supplier"
               value={formData.supplier}
               onChange={handleChange}
-              placeholder="Supplier"
               required
             />
 
           </div>
 
-          <div className="col-md-12 mb-3">
+          {/* DESCRIPTION */}
 
-            <label className="form-label">
-              <FaFileAlt className="me-2" />
+          <div className="form-group full-width">
+
+            <label htmlFor="description">
+              <FaAlignLeft />
               Description
             </label>
 
             <textarea
-              rows="4"
-              className="form-control"
+              id="description"
               name="description"
+              rows="4"
+              placeholder="Enter product description"
               value={formData.description}
               onChange={handleChange}
-              placeholder="Enter Product Description"
             />
 
           </div>
 
         </div>
 
-        <div className="d-flex gap-2">
+        {/* =================================
+            BUTTONS
+        ================================= */}
 
-          <button className="btn btn-primary">
+        <div className="form-actions">
 
+          <button
+            type="submit"
+            className="primary-btn"
+          >
             {editingProduct ? (
               <>
-                <FaSave className="me-2" />
+                <FaEdit />
                 Update Product
               </>
             ) : (
               <>
-                <FaPlusCircle className="me-2" />
+                <FaPlus />
                 Add Product
               </>
             )}
-
           </button>
 
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={clearForm}
-          >
-            <FaTimes className="me-2" />
-            Clear
-          </button>
+          {editingProduct && (
+            <button
+              type="button"
+              className="cancel-btn"
+              onClick={handleCancel}
+            >
+              <FaTimes />
+              Cancel
+            </button>
+          )}
 
         </div>
 

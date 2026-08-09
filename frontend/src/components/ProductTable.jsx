@@ -1,122 +1,186 @@
 import {
+  FaBox,
   FaEdit,
   FaTrash,
-  FaBoxOpen,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 
-function ProductTable({ products, onEdit, onDelete }) {
+function ProductTable({
+  products,
+  onEdit,
+  onDelete,
+}) {
   return (
-    <div className="card shadow-card p-3">
+    <div className="inventory-section">
 
-      <h4 className="mb-3 text-primary">
-        <FaBoxOpen className="me-2" />
-        Product List
-      </h4>
+      {/* ================================
+          HEADER
+      ================================= */}
 
-      <div className="table-responsive">
+      <div className="inventory-header">
+        <div>
+          <div className="inventory-title">
+            <FaBox />
+            <h2>Product Inventory</h2>
+          </div>
 
-        <table className="table table-hover align-middle">
+          <p>
+            {products.length}{" "}
+            {products.length === 1
+              ? "product"
+              : "products"}{" "}
+            in inventory
+          </p>
+        </div>
+      </div>
 
-          <thead className="table-dark">
+      {/* ================================
+          EMPTY STATE
+      ================================= */}
 
-            <tr>
-              <th>Product</th>
-              <th>SKU</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Quantity</th>
-              <th>Supplier</th>
-              <th width="180">Action</th>
-            </tr>
+      {products.length === 0 ? (
+        <div className="empty-inventory">
+          <FaBox />
+          <h3>No Products Found</h3>
+          <p>
+            Add your first product to the inventory.
+          </p>
+        </div>
+      ) : (
 
-          </thead>
+        /* ================================
+           TABLE
+        ================================= */
 
-          <tbody>
+        <div className="table-wrapper">
 
-            {products.length === 0 ? (
+          <table className="inventory-table">
 
+            <thead>
               <tr>
-                <td
-                  colSpan="7"
-                  className="text-center text-muted"
-                >
-                  No Products Found
-                </td>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Supplier</th>
+                <th>Action</th>
               </tr>
+            </thead>
 
-            ) : (
+            <tbody>
 
-              products.map((item) => (
+              {products.map((product) => (
 
-                <tr key={item._id}>
+                <tr key={product._id}>
+
+                  {/* PRODUCT */}
 
                   <td>
-                    <strong>{item.productName}</strong>
+                    <div className="product-name-cell">
+                      <div className="product-icon">
+                        <FaBox />
+                      </div>
+
+                      <span>
+                        {product.productName}
+                      </span>
+                    </div>
                   </td>
 
-                  <td>{item.sku}</td>
+                  {/* CATEGORY */}
 
                   <td>
-
-                    <span className="badge bg-info">
-                      {item.category}
+                    <span className="category-badge">
+                      {product.category}
                     </span>
-
                   </td>
 
+                  {/* PRICE */}
+
                   <td>
-                    ₹{item.price}
+                    <span className="price-cell">
+                      ₹{" "}
+                      {Number(
+                        product.price || 0
+                      ).toLocaleString("en-IN")}
+                    </span>
                   </td>
 
+                  {/* QUANTITY */}
+
                   <td>
-
-                    {Number(item.quantity) < 10 ? (
-
-                      <span className="badge bg-danger">
-                        {item.quantity} Low
+                    {Number(product.quantity) <= 5 ? (
+                      <span className="quantity-low">
+                        <FaExclamationTriangle />
+                        {product.quantity}
                       </span>
-
                     ) : (
-
-                      <span className="badge bg-success">
-                        {item.quantity}
+                      <span className="quantity-normal">
+                        {product.quantity}
                       </span>
-
                     )}
-
                   </td>
 
-                  <td>{item.supplier}</td>
+                  {/* SUPPLIER */}
 
                   <td>
+                    <span className="supplier-cell">
+                      {product.supplier}
+                    </span>
+                  </td>
 
-                    <button
-                      className="btn btn-warning btn-sm me-2"
-                      onClick={() => onEdit(item)}
-                    >
-                      <FaEdit /> Edit
-                    </button>
+                  {/* ACTION */}
 
-                    <button
-                      className="btn btn-danger btn-sm"
-                      onClick={() => onDelete(item._id)}
-                    >
-                      <FaTrash /> Delete
-                    </button>
+                  <td>
+                    <div className="action-buttons">
 
+                      {onEdit && (
+                        <button
+                          type="button"
+                          className="edit-btn"
+                          onClick={() =>
+                            onEdit(product)
+                          }
+                          title="Edit Product"
+                        >
+                          <FaEdit />
+                          <span>Edit</span>
+                        </button>
+                      )}
+
+                      {onDelete && (
+                        <button
+                          type="button"
+                          className="delete-btn"
+                          onClick={() =>
+                            onDelete(product._id)
+                          }
+                          title="Delete Product"
+                        >
+                          <FaTrash />
+                          <span>Delete</span>
+                        </button>
+                      )}
+
+                      {!onEdit && !onDelete && (
+                        <span className="view-only">
+                          View Only
+                        </span>
+                      )}
+
+                    </div>
                   </td>
 
                 </tr>
 
-              ))
+              ))}
 
-            )}
+            </tbody>
 
-          </tbody>
+          </table>
 
-        </table>
-
-      </div>
+        </div>
+      )}
 
     </div>
   );
