@@ -1,8 +1,10 @@
+import { useState } from "react";
+
 import {
   FaBox,
   FaEdit,
   FaTrash,
-  FaExclamationTriangle,
+  FaTimes,
 } from "react-icons/fa";
 
 function ProductTable({
@@ -10,51 +12,33 @@ function ProductTable({
   onEdit,
   onDelete,
 }) {
+  const [selectedProduct, setSelectedProduct] =
+    useState(null);
+
+  const defaultImage =
+    "https://via.placeholder.com/300x300?text=No+Image";
+
   return (
-    <div className="inventory-section">
+    <>
+      <div className="inventory-container">
 
-      {/* ================================
-          HEADER
-      ================================= */}
+        <div className="inventory-header">
 
-      <div className="inventory-header">
-        <div>
-          <div className="inventory-title">
-            <FaBox />
-            <h2>Product Inventory</h2>
+          <div>
+            <h2>
+              <FaBox /> Product Inventory
+            </h2>
+
+            <p>
+              {products.length} products in inventory
+            </p>
           </div>
 
-          <p>
-            {products.length}{" "}
-            {products.length === 1
-              ? "product"
-              : "products"}{" "}
-            in inventory
-          </p>
         </div>
-      </div>
 
-      {/* ================================
-          EMPTY STATE
-      ================================= */}
+        <div className="product-table-wrapper">
 
-      {products.length === 0 ? (
-        <div className="empty-inventory">
-          <FaBox />
-          <h3>No Products Found</h3>
-          <p>
-            Add your first product to the inventory.
-          </p>
-        </div>
-      ) : (
-
-        /* ================================
-           TABLE
-        ================================= */
-
-        <div className="table-wrapper">
-
-          <table className="inventory-table">
+          <table className="product-table">
 
             <thead>
               <tr>
@@ -69,120 +53,254 @@ function ProductTable({
 
             <tbody>
 
-              {products.map((product) => (
+              {products.length === 0 ? (
 
-                <tr key={product._id}>
-
-                  {/* PRODUCT */}
-
-                  <td>
-                    <div className="product-name-cell">
-                      <div className="product-icon">
-                        <FaBox />
-                      </div>
-
-                      <span>
-                        {product.productName}
-                      </span>
-                    </div>
+                <tr>
+                  <td
+                    colSpan="6"
+                    className="no-products"
+                  >
+                    No products available
                   </td>
-
-                  {/* CATEGORY */}
-
-                  <td>
-                    <span className="category-badge">
-                      {product.category}
-                    </span>
-                  </td>
-
-                  {/* PRICE */}
-
-                  <td>
-                    <span className="price-cell">
-                      ₹{" "}
-                      {Number(
-                        product.price || 0
-                      ).toLocaleString("en-IN")}
-                    </span>
-                  </td>
-
-                  {/* QUANTITY */}
-
-                  <td>
-                    {Number(product.quantity) <= 5 ? (
-                      <span className="quantity-low">
-                        <FaExclamationTriangle />
-                        {product.quantity}
-                      </span>
-                    ) : (
-                      <span className="quantity-normal">
-                        {product.quantity}
-                      </span>
-                    )}
-                  </td>
-
-                  {/* SUPPLIER */}
-
-                  <td>
-                    <span className="supplier-cell">
-                      {product.supplier}
-                    </span>
-                  </td>
-
-                  {/* ACTION */}
-
-                  <td>
-                    <div className="action-buttons">
-
-                      {onEdit && (
-                        <button
-                          type="button"
-                          className="edit-btn"
-                          onClick={() =>
-                            onEdit(product)
-                          }
-                          title="Edit Product"
-                        >
-                          <FaEdit />
-                          <span>Edit</span>
-                        </button>
-                      )}
-
-                      {onDelete && (
-                        <button
-                          type="button"
-                          className="delete-btn"
-                          onClick={() =>
-                            onDelete(product._id)
-                          }
-                          title="Delete Product"
-                        >
-                          <FaTrash />
-                          <span>Delete</span>
-                        </button>
-                      )}
-
-                      {!onEdit && !onDelete && (
-                        <span className="view-only">
-                          View Only
-                        </span>
-                      )}
-
-                    </div>
-                  </td>
-
                 </tr>
 
-              ))}
+              ) : (
+
+                products.map((product) => (
+
+                  <tr key={product._id}>
+
+                    {/* PRODUCT */}
+                    <td>
+
+                      <div
+                        className="product-cell"
+                        onClick={() =>
+                          setSelectedProduct(product)
+                        }
+                      >
+
+                        <img
+                          src={
+                            product.image ||
+                            defaultImage
+                          }
+                          alt={product.productName}
+                          className="product-thumbnail"
+                          onError={(e) => {
+                            e.target.src =
+                              defaultImage;
+                          }}
+                        />
+
+                        <span className="product-name">
+                          {product.productName}
+                        </span>
+
+                      </div>
+
+                    </td>
+
+                    {/* CATEGORY */}
+                    <td>
+
+                      <span className="category-badge">
+                        {product.category}
+                      </span>
+
+                    </td>
+
+                    {/* PRICE */}
+                    <td className="price-cell">
+
+                      ₹{" "}
+                      {Number(
+                        product.price
+                      ).toLocaleString("en-IN")}
+
+                    </td>
+
+                    {/* QUANTITY */}
+                    <td>
+
+                      <span
+                        className={
+                          product.quantity <= 10
+                            ? "quantity-badge low-stock"
+                            : "quantity-badge"
+                        }
+                      >
+                        {product.quantity}
+                      </span>
+
+                    </td>
+
+                    {/* SUPPLIER */}
+                    <td>
+                      {product.supplier}
+                    </td>
+
+                    {/* ACTION */}
+                    <td>
+
+                      <div className="action-buttons">
+
+                        {onEdit && (
+                          <button
+                            className="edit-btn"
+                            onClick={() =>
+                              onEdit(product)
+                            }
+                          >
+                            <FaEdit />
+                            Edit
+                          </button>
+                        )}
+
+                        {onDelete && (
+                          <button
+                            className="delete-btn"
+                            onClick={() =>
+                              onDelete(product._id)
+                            }
+                          >
+                            <FaTrash />
+                            Delete
+                          </button>
+                        )}
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                ))
+
+              )}
 
             </tbody>
 
           </table>
 
         </div>
+
+        <p className="click-product-hint">
+          💡 Click a product to view its details
+        </p>
+
+      </div>
+
+      {/* ================================= */}
+      {/* PRODUCT DETAILS MODAL */}
+      {/* ================================= */}
+
+      {selectedProduct && (
+
+        <div
+          className="product-modal-overlay"
+          onClick={() =>
+            setSelectedProduct(null)
+          }
+        >
+
+          <div
+            className="product-modal"
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+          >
+
+            <button
+              className="modal-close-btn"
+              onClick={() =>
+                setSelectedProduct(null)
+              }
+            >
+              <FaTimes />
+            </button>
+
+            {/* IMAGE */}
+
+            <div className="modal-image-container">
+
+              <img
+                src={
+                  selectedProduct.image ||
+                  defaultImage
+                }
+                alt={
+                  selectedProduct.productName
+                }
+                className="modal-product-image"
+                onError={(e) => {
+                  e.target.src =
+                    defaultImage;
+                }}
+              />
+
+            </div>
+
+            {/* DETAILS */}
+
+            <div className="modal-product-details">
+
+              <h2>
+                {selectedProduct.productName}
+              </h2>
+
+              <span className="modal-category">
+                {selectedProduct.category}
+              </span>
+
+              <div className="modal-info-grid">
+
+                <div>
+                  <small>Price</small>
+                  <strong>
+                    ₹{" "}
+                    {Number(
+                      selectedProduct.price
+                    ).toLocaleString("en-IN")}
+                  </strong>
+                </div>
+
+                <div>
+                  <small>Quantity</small>
+                  <strong>
+                    {selectedProduct.quantity}
+                  </strong>
+                </div>
+
+                <div>
+                  <small>Supplier</small>
+                  <strong>
+                    {selectedProduct.supplier}
+                  </strong>
+                </div>
+
+              </div>
+
+              <div className="description-section">
+
+                <h4>Description</h4>
+
+                <p>
+                  {selectedProduct.description ||
+                    "No description available."}
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
       )}
 
-    </div>
+    </>
   );
 }
 

@@ -7,6 +7,7 @@ import {
   FaHashtag,
   FaTruck,
   FaAlignLeft,
+  FaImage,
   FaPlus,
   FaEdit,
   FaTimes,
@@ -25,12 +26,10 @@ function ProductForm({
     quantity: "",
     supplier: "",
     description: "",
+    image: "",
   });
 
-  // =====================================
-  // LOAD EDITING PRODUCT
-  // =====================================
-
+  // Load product data when editing
   useEffect(() => {
     if (editingProduct) {
       setFormData({
@@ -40,6 +39,7 @@ function ProductForm({
         quantity: editingProduct.quantity ?? "",
         supplier: editingProduct.supplier || "",
         description: editingProduct.description || "",
+        image: editingProduct.image || "",
       });
     } else {
       setFormData({
@@ -49,14 +49,12 @@ function ProductForm({
         quantity: "",
         supplier: "",
         description: "",
+        image: "",
       });
     }
   }, [editingProduct]);
 
-  // =====================================
-  // HANDLE INPUT CHANGE
-  // =====================================
-
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -66,10 +64,7 @@ function ProductForm({
     }));
   };
 
-  // =====================================
-  // CLEAR FORM
-  // =====================================
-
+  // Clear form
   const clearForm = () => {
     setFormData({
       productName: "",
@@ -78,13 +73,11 @@ function ProductForm({
       quantity: "",
       supplier: "",
       description: "",
+      image: "",
     });
   };
 
-  // =====================================
-  // CANCEL EDITING
-  // =====================================
-
+  // Cancel editing
   const handleCancel = () => {
     clearForm();
 
@@ -93,14 +86,11 @@ function ProductForm({
     }
   };
 
-  // =====================================
-  // SUBMIT FORM
-  // =====================================
-
+  // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
+    // Validation
     if (
       !formData.productName.trim() ||
       !formData.category.trim() ||
@@ -121,47 +111,35 @@ function ProductForm({
     }
 
     try {
+      const productData = {
+        ...formData,
+        price: Number(formData.price),
+        quantity: Number(formData.quantity),
+      };
+
       if (editingProduct) {
         await updateProduct(
           editingProduct._id,
-          {
-            ...formData,
-            price: Number(formData.price),
-            quantity: Number(formData.quantity),
-          }
+          productData
         );
       } else {
-        await addProduct({
-          ...formData,
-          price: Number(formData.price),
-          quantity: Number(formData.quantity),
-        });
+        await addProduct(productData);
       }
 
       clearForm();
     } catch (error) {
-      console.error(
-        "Form submission error:",
-        error
-      );
+      console.error("Form submission error:", error);
     }
   };
 
   return (
     <div className="product-form-card">
 
-      {/* =================================
-          FORM HEADER
-      ================================= */}
-
+      {/* HEADER */}
       <div className="product-form-header">
 
         <div className="form-title-icon">
-          {editingProduct ? (
-            <FaEdit />
-          ) : (
-            <FaPlus />
-          )}
+          {editingProduct ? <FaEdit /> : <FaPlus />}
         </div>
 
         <div>
@@ -180,16 +158,12 @@ function ProductForm({
 
       </div>
 
-      {/* =================================
-          FORM
-      ================================= */}
-
+      {/* FORM */}
       <form onSubmit={handleSubmit}>
 
         <div className="form-grid">
 
           {/* PRODUCT NAME */}
-
           <div className="form-group">
 
             <label htmlFor="productName">
@@ -210,7 +184,6 @@ function ProductForm({
           </div>
 
           {/* CATEGORY */}
-
           <div className="form-group">
 
             <label htmlFor="category">
@@ -231,7 +204,6 @@ function ProductForm({
           </div>
 
           {/* PRICE */}
-
           <div className="form-group">
 
             <label htmlFor="price">
@@ -254,7 +226,6 @@ function ProductForm({
           </div>
 
           {/* QUANTITY */}
-
           <div className="form-group">
 
             <label htmlFor="quantity">
@@ -277,7 +248,6 @@ function ProductForm({
           </div>
 
           {/* SUPPLIER */}
-
           <div className="form-group">
 
             <label htmlFor="supplier">
@@ -297,8 +267,39 @@ function ProductForm({
 
           </div>
 
-          {/* DESCRIPTION */}
+          {/* IMAGE URL */}
+          <div className="form-group">
 
+            <label htmlFor="image">
+              <FaImage />
+              Product Image URL
+            </label>
+
+            <input
+              id="image"
+              type="url"
+              name="image"
+              placeholder="https://example.com/product.jpg"
+              value={formData.image}
+              onChange={handleChange}
+            />
+
+          </div>
+
+          {/* IMAGE PREVIEW */}
+          {formData.image && (
+            <div className="image-preview">
+              <img
+                src={formData.image}
+                alt="Product Preview"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            </div>
+          )}
+
+          {/* DESCRIPTION */}
           <div className="form-group full-width">
 
             <label htmlFor="description">
@@ -319,10 +320,7 @@ function ProductForm({
 
         </div>
 
-        {/* =================================
-            BUTTONS
-        ================================= */}
-
+        {/* BUTTONS */}
         <div className="form-actions">
 
           <button
